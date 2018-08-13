@@ -1,0 +1,21 @@
+kind: ServiceAccount
+metadata:
+  labels:
+    k8s-app: prometheus
+  name: prometheus
+  namespace: devops
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+  labels: 
+    k8s-app: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: prometheus 
+  namespace: devops

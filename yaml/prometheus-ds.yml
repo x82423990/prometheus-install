@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: prometheus
+  name: prometheus
+  namespace: devops
+
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus-server
+      annotations:
+        prometheus.io/port: '9090'
+        prometheus.io/scrape: 'true'
+    spec:
+      serviceAccountName: prometheus
+      serviceAccount: prometheus
+      imagePullSecrets:
+        - name: bycx-registry
+      containers:
+        - name: prometheus
+          imagePullPolicy: Always
+          image: registry.boyait.9fwealth.com:1443/devops/images/prometheus:2.3.2
+          command:
+            - "/app/prometheus/prometheus"
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--storage.tsdb.retention=3650d"
+            - "--web.enable-lifecycle"
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          volumeMounts:
+            - mountPath: "/prometheus"
+              name: data
+            - mountPath: "/etc/prometheus"
+              name: config-volume
+            - mountPath: "/etc/prometheus-rules"
+              name: rules-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 2500Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: prometheus-nfs 
+        - name: config-volume
+          configMap:
+            name: prometheus-config
+        - name: rules-config
+          configMap:
+            name: prometheus-rules-config

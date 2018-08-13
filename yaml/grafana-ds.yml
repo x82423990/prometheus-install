@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: grafana
+  name: grafana 
+  namespace: devops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana-server
+    spec:
+      imagePullSecrets:
+        - name: bycx-registry
+      containers:
+        - name: grafana
+          imagePullPolicy: Always
+          image: registry.boyait.9fwealth.com:1443/devops/images/grafana:5.1.3-1
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+          - mountPath: "/var/lib/grafana"
+            name: data
+          - name: grafana-config
+            mountPath: /etc/grafana/grafana.ini
+            subPath: grafana.ini
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 2500Mi
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: grafana-nfs
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+          items:
+          - key: grafana.ini
+            path: grafana.ini

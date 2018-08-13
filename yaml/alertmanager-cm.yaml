@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: devops
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'smtp.163.com:25'
+      smtp_from: 'eatted@163.com'
+      smtp_auth_username: 'eatted@163.com'
+      smtp_auth_password: 'xl50140872'
+    
+    
+    route:
+      receiver: 'ops'
+      group_by: ['alertname', 'gz']
+      group_wait: 30s
+      group_interval: 2m
+      repeat_interval: 2m
+    
+      routes:
+      - match_re:
+          com: bycx 
+        receiver: 'ops'
+        routes:
+        - match:
+            severity: critical
+          receiver: leader
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname']
+    receivers:
+    - name: 'ops'
+      email_configs:
+      - to: '82423990@qq.com'
+    - name: 'leader'
+      email_configs:
+      - to: 'eatted@163.com'

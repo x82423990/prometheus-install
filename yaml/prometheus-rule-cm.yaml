@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules-config
+  namespace: devops
+data:
+  prometheus-rules.yml: |
+    groups:
+    - name: NodeAlert
+      rules:
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "hostname {{ $labels.hostname }} is down"
+          description: "{{ $labels.hostname }} of job {{ $labels.job }} has been down for more than 5 minutes."
+    
+      - alert: Load
+        expr: node_load1/count(count(node_cpu_seconds_total) without (mode)) without (cpu)>0.8
+        for: 5m
+        annotations:
+          summary: "host {{ $labels.hostname }} load too hight."
+          description: "{{ $labels.hostname }} of job {{ $labels.job }} load  more than: {{ $value }}!"
