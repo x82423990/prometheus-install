@@ -7,9 +7,9 @@ data:
   alertmanager.yml: |
     global:
       smtp_smarthost: 'smtp.163.com:25'
-      smtp_from: 'eatted@163.com'
-      smtp_auth_username: 'eatted@163.com'
-      smtp_auth_password: 'xl50140872'
+      smtp_from: 'xxxx@163.com'
+      smtp_auth_username: 'xxx@163.com'
+      smtp_auth_password: 'xxxx'
     
     
     route:
